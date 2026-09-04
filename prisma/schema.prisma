@@ -1,0 +1,157 @@
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Auth Models (Better Auth) ───────────────────────────────────────────────
+
+model User {
+  id            String   @id
+  name          String
+  email         String   @unique
+  emailVerified Boolean  @default(false)
+  image         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  sessions      Session[]
+  accounts      Account[]
+  presentations Presentation[]
+
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("session")
+  @@index([userId])
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  issuer String
+
+  @@map("account")
+  @@unique([issuer, accountId], map: "account_issuer_accountId_uidx")
+  @@index([userId])
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("verification")
+  @@index([identifier])
+}
+
+// ─── Core Models ─────────────────────────────────────────────────────────────
+
+model Presentation {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  title      String
+  prompt     String             @db.Text
+  slideCount Int
+  style      PresentationStyle  @default(MINIMAL)
+  tone       PresentationTone   @default(PROFESSIONAL)
+  layout     PresentationLayout @default(BALANCED)
+  status     PresentationStatus @default(DRAFT)
+  version    Int                @default(1)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  slides    Slide[]
+
+  @@index([userId])
+  @@index([status])
+  @@map("presentation")
+}
+
+model Slide {
+  id             String       @id @default(cuid())
+  presentationId String
+  presentation   Presentation @relation(fields: [presentationId], references: [id], onDelete: Cascade)
+
+  order       Int
+  title       String
+  content     String  @db.Text
+  notes       String? @db.Text
+  imageUrl    String?
+  imagePrompt String?
+  layoutType  String? // "title", "content", "image-left", "image-right", "quote"
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([presentationId])
+  @@map("slide")
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum PresentationStatus {
+  DRAFT
+  GENERATING
+  COMPLETED
+  FAILED
+}
+
+enum PresentationStyle {
+  MINIMAL
+  BOLD
+  CORPORATE
+  CREATIVE
+  ACADEMIC
+  DARK
+}
+
+enum PresentationTone {
+  PROFESSIONAL
+  CASUAL
+  INSPIRATIONAL
+  TECHNICAL
+  PERSUASIVE
+  STORYTELLING
+}
+
+enum PresentationLayout {
+  BALANCED
+  IMAGE_HEAVY
+  TEXT_HEAVY
+  MINIMAL
+  SPLIT
+}
