@@ -9,7 +9,7 @@ import {
 } from '../types/schemas'
 
 export const createPresentation = createServerFn({ method: 'POST' })
-  .inputValidator((data: unknown) => createPresentationInputSchema.parse(data))
+  .validator((data: unknown) => createPresentationInputSchema.parse(data))
   .handler(async ({ data }) => {
     const userId = await requireUserId()
 
@@ -32,7 +32,6 @@ export const createPresentation = createServerFn({ method: 'POST' })
         data: { presentationId: presentation.id },
       })
     } catch {
-      // IMPROVEMENT: don't leave a stuck GENERATING row if dispatch fails
       await prisma.presentation.update({
         where: { id: presentation.id },
         data: { status: 'FAILED' },
@@ -44,7 +43,7 @@ export const createPresentation = createServerFn({ method: 'POST' })
   })
 
 export const updatePresentation = createServerFn({ method: 'POST' })
-  .inputValidator((data: unknown) => updatePresentationInputSchema.parse(data))
+  .validator((data: unknown) => updatePresentationInputSchema.parse(data))
   .handler(async ({ data }) => {
     const userId = await requireUserId()
     const { id, ...patch } = data
@@ -54,7 +53,7 @@ export const updatePresentation = createServerFn({ method: 'POST' })
   })
 
 export const deletePresentation = createServerFn({ method: 'POST' })
-  .inputValidator((data: unknown) => presentationIdInputSchema.parse(data))
+  .validator((data: unknown) => presentationIdInputSchema.parse(data))
   .handler(async ({ data }) => {
     const userId = await requireUserId()
     const existing = await prisma.presentation.findFirst({ where: { id: data.id, userId } })
@@ -64,7 +63,7 @@ export const deletePresentation = createServerFn({ method: 'POST' })
   })
 
 export const regeneratePresentation = createServerFn({ method: 'POST' })
-  .inputValidator((data: unknown) => presentationIdInputSchema.parse(data))
+  .validator((data: unknown) => presentationIdInputSchema.parse(data))
   .handler(async ({ data }) => {
     const userId = await requireUserId()
     const existing = await prisma.presentation.findFirst({ where: { id: data.id, userId } })

@@ -12,7 +12,7 @@ export const listPresentations = createServerFn({ method: 'GET' }).handler(async
 })
 
 export const getPresentationWithSlides = createServerFn({ method: 'GET' })
-  .inputValidator((data: unknown) => presentationIdInputSchema.parse(data))
+  .validator((data: unknown) => presentationIdInputSchema.parse(data))
   .handler(async ({ data }) => {
     const userId = await requireUserId()
     const row = await prisma.presentation.findFirst({

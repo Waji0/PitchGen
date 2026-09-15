@@ -53,10 +53,26 @@ export const generatePresentation = inngest.createFunction(
 
     const { slides } = await step.run('generate-slides-content', async () => {
       try {
+//         const { object } = await generateObject({
+//           // model: google('gemini-2.5-flash'),
+//           model: google('gemini-3.6-flash'),
+//           schema: slidesResponseSchema,
+//           system: `You are an expert presentation designer. Create a compelling, concise presentation.
+// Style: ${presentation.style}
+// Tone: ${presentation.tone}
+// Layout preference: ${presentation.layout}
+// Rules:
+// - Create exactly ${presentation.slideCount} slides
+// - First slide is a title slide, last slide is a summary or call-to-action
+// - Keep bullet points short and impactful
+// - imagePrompt must describe a professional illustration with NO text`,
+//           prompt: presentation.prompt,
+//         })
         const { object } = await generateObject({
-          model: google('gemini-2.5-flash'),
-          schema: slidesResponseSchema,
-          system: `You are an expert presentation designer. Create a compelling, concise presentation.
+  // model: google('gemini-3.6-flash'),
+  model: google(process.env.GEMINI_MODEL ?? 'gemini-3.6-flash'),
+  schema: slidesResponseSchema,
+  system: `You are an expert presentation designer. Create a compelling, concise presentation.
 Style: ${presentation.style}
 Tone: ${presentation.tone}
 Layout preference: ${presentation.layout}
@@ -65,7 +81,7 @@ Rules:
 - First slide is a title slide, last slide is a summary or call-to-action
 - Keep bullet points short and impactful
 - imagePrompt must describe a professional illustration with NO text`,
-          prompt: presentation.prompt,
+  prompt: presentation.prompt,
         })
         return object
       } catch (error) {
