@@ -79,24 +79,48 @@ import { Button } from '#/components/ui/button'
 import { Sparkles, Home } from 'lucide-react'
 import appCss from '#/styles.css?url'
 
+import { RouteError } from '#/components/route-error'
+
 interface RouterContext {
   queryClient: QueryClient
 }
 
 export const Route = createRootRouteWithContext<RouterContext>()({
+  // head: () => ({
+  //   meta: [
+  //     { charSet: 'utf-8' },
+  //     { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+  //     { title: 'PitchGen — Make your story impossible to ignore' },
+  //   ],
+  //   links: [{ rel: 'stylesheet', href: appCss }],
+  // }),
   head: () => ({
     meta: [
-      { charSet: 'utf-8' },
-      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { title: 'PitchGen — Make your story impossible to ignore' },
+      { charSet: "utf-8" },
+      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { title: "PitchGen — Make your story impossible to ignore" },
+      {
+        name: "description",
+        content:
+          "AI-powered presentation generator. Turn any idea into a beautifully designed, fully illustrated pitch deck in seconds.",
+      },
+      { property: "og:title", content: "PitchGen" },
+      {
+        property: "og:description",
+        content: "Make your story impossible to ignore.",
+      },
+      { property: "og:type", content: "website" },
     ],
-    links: [{ rel: 'stylesheet', href: appCss }],
+    links: [
+      { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
+      { rel: "stylesheet", href: appCss },
+    ],
   }),
   component: RootLayout,
   shellComponent: RootDocument,
-  // FIX: Add a custom 404 component to silence the warning
-  notFoundComponent: NotFoundComponent,
-})
+  notFoundComponent: NotFoundComponent, // FIX: Add a custom 404 component to silence the warning
+  errorComponent: ({ error, reset }) => <RouteError error={error} reset={reset} />,
+});
 
 function NotFoundComponent() {
   return (

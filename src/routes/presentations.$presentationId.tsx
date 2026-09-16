@@ -256,6 +256,7 @@ import { exportToPptx } from '#/features/presentations/lib/export-pptx'
 import { reorderSlides } from '#/features/presentations/actions/presentation-mutations'
 import { presentationQueryKeys } from '#/features/presentations/hooks/query-keys'
 import { Button } from '#/components/ui/button'
+import { RouteError } from '#/components/route-error'
 
 export const Route = createFileRoute('/presentations/$presentationId')({
   beforeLoad: async () => {
@@ -263,6 +264,7 @@ export const Route = createFileRoute('/presentations/$presentationId')({
     if (!session) throw redirect({ to: '/login' })
   },
   component: PresentationDetail,
+  errorComponent: ({ error }) => <RouteError error={error} />,
 })
 
 function PresentationDetail() {

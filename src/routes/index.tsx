@@ -58,6 +58,9 @@ import { Label } from '#/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '#/components/ui/select'
 import { Slider } from '#/components/ui/slider'
 
+import { Skeleton } from '#/components/ui/skeleton'
+import { Presentation } from 'lucide-react'
+
 export const Route = createFileRoute('/')({
   beforeLoad: async ({ location }) => {
     const session = await getSession()
@@ -77,9 +80,14 @@ function Dashboard() {
     layout: 'BALANCED' as const,
   })
 
-  const { data: presentations = [] } = useQuery({
-    queryKey: presentationQueryKeys.list(),
-    queryFn: () => listPresentations(),
+  // const { data: presentations = [] } = useQuery({
+  //   queryKey: presentationQueryKeys.list(),
+  //   queryFn: () => listPresentations(),
+  // })
+
+  const { data: presentations = [], isPending } = useQuery({
+  queryKey: presentationQueryKeys.list(),
+  queryFn: () => listPresentations(),
   })
 
   const createMut = useMutation({
@@ -101,10 +109,12 @@ function Dashboard() {
     <main className="max-w-6xl mx-auto px-4 py-8 space-y-12">
       <header className="text-center space-y-3">
         <h1 className="text-4xl md:text-5xl font-bold">
-          Make your story <span className="text-gradient-peach">impossible to ignore</span>
+          Make your story{" "}
+          <span className="text-gradient-peach">impossible to ignore</span>
         </h1>
         <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-          Enter your topic, notes, or outline. PitchGen's AI will write, design, and illustrate a complete presentation.
+          Enter your topic, notes, or outline. PitchGen's AI will write, design,
+          and illustrate a complete presentation.
         </p>
       </header>
 
@@ -113,73 +123,152 @@ function Dashboard() {
           placeholder="e.g. 'A pitch deck for a B2B SaaS startup focusing on AI-driven customer support...'"
           value={form.prompt}
           // onChange={(e) => setForm((s) => ({ ...s, prompt: e.target.value }))}
-          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setForm((s) => ({ ...s, prompt: e.target.value }))}
+          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+            setForm((s) => ({ ...s, prompt: e.target.value }))
+          }
           className="min-h-[140px] text-base bg-background/50 border-border/50 rounded-xl resize-none focus-visible:ring-primary/30"
         />
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="space-y-2.5">
-            <Label className="text-sm font-medium">Slides: {form.slideCount}</Label>
+            <Label className="text-sm font-medium">
+              Slides: {form.slideCount}
+            </Label>
             <Slider
               value={[form.slideCount]}
               // onValueChange={([v]) => setForm((s) => ({ ...s, slideCount: v }))}
-              onValueChange={([v]: [number]) => setForm((s) => ({ ...s, slideCount: v }))}
-              min={3} max={20} step={1}
+              onValueChange={([v]: [number]) =>
+                setForm((s) => ({ ...s, slideCount: v }))
+              }
+              min={3}
+              max={20}
+              step={1}
             />
           </div>
           <div className="space-y-2.5">
             <Label className="text-sm font-medium">Style</Label>
-            <Select value={form.style} 
-            // onValueChange={(v: any) => setForm((s) => ({ ...s, style: v }))}
-            onValueChange={(v: string) => setForm((s) => ({ ...s, style: v as any }))}
+            <Select
+              value={form.style}
+              // onValueChange={(v: any) => setForm((s) => ({ ...s, style: v }))}
+              onValueChange={(v: string) =>
+                setForm((s) => ({ ...s, style: v as any }))
+              }
             >
-              <SelectTrigger className="bg-background/50 border-border/50 rounded-xl"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="bg-background/50 border-border/50 rounded-xl">
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent className="glass">
-                {SLIDE_STYLES.map((s) => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}
+                {SLIDE_STYLES.map((s) => (
+                  <SelectItem key={s.value} value={s.value}>
+                    {s.label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
           <div className="space-y-2.5">
             <Label className="text-sm font-medium">Tone</Label>
-            <Select value={form.tone} 
-            // onValueChange={(v: any) => setForm((s) => ({ ...s, tone: v }))}
-            onValueChange={(v: string) => setForm((s) => ({ ...s, tone: v as any }))}
+            <Select
+              value={form.tone}
+              // onValueChange={(v: any) => setForm((s) => ({ ...s, tone: v }))}
+              onValueChange={(v: string) =>
+                setForm((s) => ({ ...s, tone: v as any }))
+              }
             >
-              <SelectTrigger className="bg-background/50 border-border/50 rounded-xl"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="bg-background/50 border-border/50 rounded-xl">
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent className="glass">
-                {TONE_OPTIONS.map((t) => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
+                {TONE_OPTIONS.map((t) => (
+                  <SelectItem key={t.value} value={t.value}>
+                    {t.label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
           <div className="space-y-2.5">
             <Label className="text-sm font-medium">Layout</Label>
-            <Select value={form.layout} 
-            // onValueChange={(v: any) => setForm((s) => ({ ...s, layout: v }))}
-            onValueChange={(v: string) => setForm((s) => ({ ...s, layout: v as any }))}
+            <Select
+              value={form.layout}
+              // onValueChange={(v: any) => setForm((s) => ({ ...s, layout: v }))}
+              onValueChange={(v: string) =>
+                setForm((s) => ({ ...s, layout: v as any }))
+              }
             >
-              <SelectTrigger className="bg-background/50 border-border/50 rounded-xl"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="bg-background/50 border-border/50 rounded-xl">
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent className="glass">
-                {LAYOUT_OPTIONS.map((l) => <SelectItem key={l.value} value={l.value}>{l.label}</SelectItem>)}
+                {LAYOUT_OPTIONS.map((l) => (
+                  <SelectItem key={l.value} value={l.value}>
+                    {l.label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
         </div>
 
         <div className="flex justify-end pt-2">
-          <Button size="lg" onClick={handleGenerate} disabled={createMut.isPending} className="rounded-xl px-8 gap-2 font-semibold">
-            {createMut.isPending ? <><Sparkles className="size-5 animate-pulse" /> Creating...</> : <><Wand2 className="size-5" /> Generate Pitch</>}
+          <Button
+            size="lg"
+            onClick={handleGenerate}
+            disabled={createMut.isPending}
+            className="rounded-xl px-8 gap-2 font-semibold"
+          >
+            {createMut.isPending ? (
+              <>
+                <Sparkles className="size-5 animate-pulse" /> Creating...
+              </>
+            ) : (
+              <>
+                <Wand2 className="size-5" /> Generate Pitch
+              </>
+            )}
           </Button>
         </div>
       </div>
 
       {presentations.length > 0 && (
+        // <section className="space-y-4">
+        //   <h2 className="text-2xl font-bold flex items-center gap-2">Your Decks</h2>
+        //   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        //     {presentations.map((p) => <PresentationCard key={p.id} p={p} />)}
+        //   </div>
+        // </section>
+
+        // replace the presentations list section with:
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold flex items-center gap-2">Your Decks</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {presentations.map((p) => <PresentationCard key={p.id} p={p} />)}
-          </div>
+          <h2 className="text-2xl font-bold flex items-center gap-2">
+            Your Decks
+          </h2>
+          {isPending ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <Skeleton key={i} className="h-32 rounded-xl" />
+              ))}
+            </div>
+          ) : presentations.length === 0 ? (
+            <div className="glass rounded-2xl p-12 text-center space-y-3">
+              <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
+                <Presentation className="size-7 text-primary" />
+              </div>
+              <h3 className="text-lg font-semibold">No decks yet</h3>
+              <p className="text-sm text-muted-foreground max-w-sm mx-auto">
+                Your generated presentations will appear here. Create your first
+                pitch above!
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {presentations.map((p) => (
+                <PresentationCard key={p.id} p={p} />
+              ))}
+            </div>
+          )}
         </section>
       )}
     </main>
-  )
+  );
 }
