@@ -164,7 +164,7 @@ export const generatePresentation = inngest.createFunction(
   async ({ event, step }: { event: any; step: any }) => {
     // Safely extract presentationId and log for debugging
     const presentationId = event?.data?.presentationId as string | undefined
-    console.log('INNGEST RECEIVED DATA:', JSON.stringify(event.data))
+    // console.log('INNGEST RECEIVED DATA:', JSON.stringify(event.data))
 
     if (!presentationId) {
       throw new Error('presentationId is missing from event data!')
